@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Al-Shifa Dental Clinic</title>
+  <style>
+    :root { --brand: #6C63FF; }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif; color: #1f2330; background: #fafbff; }
+    header { background: linear-gradient(135deg, var(--brand), #4b44c9); color: #fff; padding: 70px 24px; text-align: center; }
+    header h1 { margin: 0 0 10px; font-size: 40px; }
+    header p { margin: 0; opacity: .9; font-size: 18px; }
+    main { max-width: 900px; margin: 0 auto; padding: 40px 24px 120px; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 18px; margin-top: 24px; }
+    .card { background: #fff; border-radius: 14px; padding: 20px; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
+    .card h3 { margin: 0 0 6px; }
+    .card p { margin: 0; color: #555; font-size: 14px; }
+    .hint { margin-top: 40px; padding: 16px 20px; background: #eef0ff; border-left: 4px solid var(--brand); border-radius: 8px; }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Al-Shifa Dental Clinic</h1>
+    <p>Gulshan-e-Iqbal, Karachi · Family dentistry since 2015</p>
+  </header>
+  <main>
+    <h2>Our services</h2>
+    <div class="grid">
+      <div class="card"><h3>Check-up &amp; cleaning</h3><p>Routine exams, scaling and polishing for the whole family.</p></div>
+      <div class="card"><h3>Root canal &amp; fillings</h3><p>Pain-free treatment under local anesthesia.</p></div>
+      <div class="card"><h3>Braces &amp; aligners</h3><p>Free orthodontic assessment every Saturday.</p></div>
+      <div class="card"><h3>Implants &amp; crowns</h3><p>Zirconia crowns and single-tooth implants with installment plans.</p></div>
+    </div>
+    <div class="hint">
+      <strong>Try the assistant</strong> using the chat button at the bottom right. Ask about prices, timings, or book an appointment, in English, Urdu, or Roman Urdu.
+    </div>
+  </main>
+
+  <!-- The whole chatbot is this one line. Paste it into any website. -->
+  <script src="/widget.js" data-api="/api/chat" data-title="Al-Shifa Dental Clinic" data-color="#6C63FF"></script>
+</body>
+</html>

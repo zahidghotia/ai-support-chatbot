@@ -5,17 +5,20 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node --env-file=.env src/index.ts",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "web": "node --env-file=.env src/server.ts"
   },
   "keywords": [],
   "author": "",
-  "license": "ISC",
-  "description": "",
+  "license": "MIT",
+  "description": "AI customer-support chatbot that answers from your business documents, built with the Claude API",
   "type": "module",
   "dependencies": {
-    "@anthropic-ai/sdk": "^0.131.0"
+    "@anthropic-ai/sdk": "^0.131.0",
+    "express": "^5.2.1"
   },
   "devDependencies": {
+    "@types/express": "^5.0.6",
     "@types/node": "^26.6.4",
     "typescript": "^7.0.2"
   }

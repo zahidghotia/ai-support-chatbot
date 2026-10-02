@@ -83,6 +83,8 @@ flowchart LR
 1. **`src/knowledge.ts`** reads every `.md` / `.txt` in `data/` and wraps each in a `<document>` tag.
 2. **`src/chat.ts`** builds a two-block system prompt. The large knowledge-base block carries `cache_control`, so it is cached after the first request.
 3. **`src/index.ts`** runs the terminal chat loop. The API is stateless, so the full history is sent each turn.
+4. **`src/server.ts`** exposes the same assistant over HTTP and serves `public/widget.js`, the embeddable chat bubble.
+5. **`src/whatsapp.ts`** (Meta) and **`src/twilio.ts`** handle WhatsApp webhooks. **`src/sessions.ts`** is the conversation store shared by every channel.
 
 ---
 
@@ -104,6 +106,58 @@ Want to see token usage and cache hits?
 DEBUG=1 npm start
 ```
 
+### Web widget
+
+```bash
+npm run web
+```
+
+Open **http://localhost:3000** for a demo landing page with the chat bubble in the corner. The server keeps the API key private, streams replies, and remembers each visitor's conversation for 30 minutes.
+
+To put the widget on any website, add one line before `</body>`:
+
+```html
+<script src="https://YOUR-SERVER/widget.js"
+        data-api="https://YOUR-SERVER/api/chat"
+        data-title="Your Business Name"
+        data-color="#6C63FF"></script>
+```
+
+| Endpoint | Purpose |
+|---|---|
+| `GET /api/health` | Model and business name, for uptime checks |
+| `POST /api/chat` | `{ sessionId?, message }` → streamed text reply, session id in `X-Session-Id` header |
+| `GET/POST /webhooks/whatsapp` | Meta WhatsApp Cloud API webhook (mounted when `WHATSAPP_*` env vars are set) |
+| `POST /webhooks/twilio` | Twilio WhatsApp webhook, signature-verified (mounted when `TWILIO_AUTH_TOKEN` is set) |
+
+### WhatsApp
+
+The same assistant answers on WhatsApp. Each phone number gets its own conversation memory. Two providers are supported; pick one.
+
+#### Option A: Twilio Sandbox (fastest, no Meta business account)
+
+1. Sign up at [twilio.com](https://www.twilio.com), go to **Messaging → Try it out → Send a WhatsApp message**, and send the shown `join <word>` to the sandbox number from your phone.
+2. Copy your **Auth Token** from the console home page into `.env`:
+   ```
+   TWILIO_AUTH_TOKEN=...
+   ```
+3. Deploy (or run `ngrok http 3000`), then in **Sandbox settings** set "When a message comes in" to `https://YOUR-SERVER/webhooks/twilio`.
+4. Message the sandbox number. Replies are returned as TwiML, so no outbound API calls are needed. Every request's Twilio signature is verified.
+
+#### Option B: Meta WhatsApp Cloud API (production, free tier)
+
+1. Create an app at [developers.facebook.com](https://developers.facebook.com) (type: Business) and add the **WhatsApp** product.
+2. From **WhatsApp → API Setup** copy the access token and Phone number ID into `.env`:
+   ```
+   WHATSAPP_TOKEN=EAAG...
+   WHATSAPP_PHONE_NUMBER_ID=1234567890
+   WHATSAPP_VERIFY_TOKEN=any-secret-word
+   ```
+3. Deploy (or expose localhost with `ngrok http 3000`), then in **WhatsApp → Configuration** set the webhook URL to `https://YOUR-SERVER/webhooks/whatsapp` with the same verify token, and subscribe to the `messages` field.
+4. Add your phone as a test recipient and message the test number.
+
+Long replies are split at the 4,096-character WhatsApp limit, duplicate webhook deliveries are ignored, and non-text messages get a polite "text only" reply.
+
 ---
 
 ## 🛠️ Adapt it to a client
@@ -111,7 +165,7 @@ DEBUG=1 npm start
 | Step | Where |
 |---|---|
 | Replace the documents | `data/` folder (any `.md` or `.txt`) |
-| Change the business name | `BUSINESS_NAME` in `src/index.ts` |
+| Change the business name | `BUSINESS_NAME` in `src/index.ts`, or `BUSINESS_NAME=...` in `.env` for the web server |
 | Adjust tone and booking rules | `buildSystemPrompt()` in `src/chat.ts` |
 | Pick a model | `MODEL` in `src/chat.ts` |
 
@@ -132,8 +186,8 @@ A typical reply on Haiku costs around **$0.002**. One thousand customer question
 - [x] Terminal chat with streaming and history
 - [x] Grounded answers with prompt caching
 - [x] English / Urdu / Roman Urdu
-- [ ] 🌐 Web chat widget (embed on any site)
-- [ ] 💬 WhatsApp integration
+- [x] 🌐 Web chat widget (embed on any site)
+- [x] 💬 WhatsApp integration (Meta Cloud API or Twilio Sandbox)
 - [ ] 🔍 Embeddings + vector search for 100+ page knowledge bases
 - [ ] 📆 Booking tool that writes to Google Calendar
 
